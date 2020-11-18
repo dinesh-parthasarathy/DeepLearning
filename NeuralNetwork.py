@@ -1,27 +1,43 @@
-class NeuralNetwork:
-    # implement 5 public members
-    # an optimizer object, loss: list, layers: list, data_layer, loss_layer
-    # they will be set within the unit tests
+import copy
 
-    def __init(self):
-        pass
+
+class NeuralNetwork:
+
+    def __init__(self, optimizer):
+        self.optimizer = optimizer
+        self.loss = []
+        self.layers = []
+        self.data_layer = None
+        self.loss_layer = None
+        self.label_tensor = None
 
     def forward(self):
-        pass
-    # return the output of the last layer (i.e. loss layer) of the network
+        input_tensor, self.label_tensor = self.data_layer.next()
+
+        for lyr in self.layers:
+            input_tensor = lyr.forward(input_tensor)
+
+        return self.loss_layer.forward(input_tensor, self.label_tensor)
 
     def backward(self):
-        pass
-    # start from the loss layer and propogate back through the network.
+        error_tensor = self.loss_layer.backward(self.label_tensor)
+        for lyr in reversed(self.layers):
+            error_tensor = lyr.backward(error_tensor)
 
     def append_trainable_layer(self, layer):
-        pass
+        opt = copy.deepcopy(self.optimizer)
+        layer.optimizer = opt
+        self.layers.append(layer)
 
     def train(self, iterations):
-        pass
-    # trains the network for iterations and stores the loss for each iteration
+        for i in range(iterations):
+            self.loss.append(self.forward())
+            self.backward()
 
     def test(self, input_tensor):
-        pass
-    # propagates the input tensor through the network and returns the prediction of the last layer.
+        for lyr in self.layers:
+            input_tensor = lyr.forward(input_tensor)
 
+        return input_tensor
+
+    # propagates the input tensor through the network and returns the prediction of the last layer.

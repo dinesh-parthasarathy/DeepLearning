@@ -1,15 +1,15 @@
+import numpy as np
+
+
 class CrossEntropyLoss:
     def __init__(self):
-        pass
+        self.input_tensor = None
 
-    def forward(self,input_tensor,label_tensor):
-        pass
-    # computes the loss value according to the CrossEntropy Loss formula accumulated over the batch
+    def forward(self, input_tensor, label_tensor):
+        self.input_tensor = input_tensor
+        return np.sum(-np.log(np.einsum('ij,ij->i', input_tensor, label_tensor) + np.finfo(np.float).eps))
 
-    def backward(self,label_tensor):
-        pass
-    # returns the error tensor the previous layer. The backpropagation starts here hence no error_tensor is needed.
-    # Instead, we need the label_tensor
+    def backward(self, label_tensor):
+        return -label_tensor / self.input_tensor
 
 # test your implementation using cmdline param TestCrossEntropyLoss
-

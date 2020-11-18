@@ -1,14 +1,15 @@
+import numpy as np
+
+
 class ReLU:
     def __init__(self):
-        pass
+        self.input_tensor = None
 
-    def forward(self,input_tensor):
-        pass
-    # returns a tensor that serves as the input_tensor for the next layer
+    def forward(self, input_tensor):
+        self.input_tensor = input_tensor
+        return np.maximum(input_tensor, 0)
 
-    def backward(self,error_tensor):
-        pass
-    # returns a tensor that serves as the error_tensor for the previous layer.
+    def backward(self, error_tensor):
+        return (self.input_tensor > 0) * error_tensor
 
 # test your implementation using cmdline param TestReLU
-

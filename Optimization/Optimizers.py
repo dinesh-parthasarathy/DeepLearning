@@ -1,10 +1,8 @@
 class Sgd:  # Stochastic Gradient Descent
     def __init__(self, learning_rate: float):
-        pass
-
-        # returns the updated weights according to the basic gradient descent update scheme
+        self.learning_rate = learning_rate
 
     def calculate_update(self, weight_tensor, gradient_tensor):
-        pass
+        return weight_tensor - self.learning_rate * gradient_tensor
 
 # verify your implementation using cmdline param TestOptimizers

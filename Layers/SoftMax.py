@@ -1,13 +1,18 @@
+import numpy as np
+
+
 class SoftMax:
     def __init__(self):
-        pass
+        self.output_tensor = None
 
-    def forward(self,input_tensor):
-        pass
-    # return the estimated class probabilities for each row representing an element of the batch
+    def forward(self, input_tensor):
+        input_tensor = (input_tensor.T - np.amax(input_tensor, axis=1)).T
+        input_tensor = np.exp(input_tensor)
+        self.output_tensor = (input_tensor.T / input_tensor.sum(axis=1)).T
+        return self.output_tensor
 
     def backward(self, error_tensor):
-        pass
-    # return a tensor that serves as the error_tensor for the previous layer
+        return np.multiply(self.output_tensor,
+                           (error_tensor.T - np.einsum('ij,ij->i', error_tensor, self.output_tensor)).T)
 
 # test your implementation using cmdline param TestSoftMax
