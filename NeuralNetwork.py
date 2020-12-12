@@ -12,12 +12,12 @@ class NeuralNetwork:
         self.label_tensor = None
 
     def forward(self):
-        output_prev, self.label_tensor = self.data_layer.next()
+        input_data, self.label_tensor = self.data_layer.next()
 
         for lyr in self.layers:
-            output_prev = lyr.forward(output_prev)
+            input_data = lyr.forward(input_data)
 
-        return self.loss_layer.forward(output_prev, self.label_tensor)
+        return self.loss_layer.forward(input_data, self.label_tensor)
 
     def backward(self):
         error_tensor = self.loss_layer.backward(self.label_tensor)
