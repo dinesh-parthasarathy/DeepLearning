@@ -3,8 +3,10 @@ import copy
 
 class NeuralNetwork:
 
-    def __init__(self, optimizer):
+    def __init__(self, optimizer, weights_initializer, bias_initializer):
         self.optimizer = optimizer
+        self.weight_initializer = weights_initializer
+        self.bias_initializer = bias_initializer
         self.loss = []
         self.layers = []
         self.data_layer = None
@@ -26,6 +28,7 @@ class NeuralNetwork:
 
     def append_trainable_layer(self, layer):
         opt = copy.deepcopy(self.optimizer)
+        layer.initialize(self.weight_initializer, self.bias_initializer)
         layer.optimizer = opt
         self.layers.append(layer)
 

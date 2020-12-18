@@ -21,6 +21,14 @@ class FullyConnected:
     def gradient_weights(self):
         return self._gradient_weights
 
+    def initialize(self, weights_initializer, bias_initializer):
+        input_size = np.shape(self.weights)[0] - 1
+        output_size = np.shape(self.weights)[1]
+        shape = (input_size, output_size)
+
+        self.weights = np.append(weights_initializer.initialize(shape, input_size, output_size),
+                                 bias_initializer.initialize((1, output_size), input_size, output_size), axis=0)
+
     def forward(self, input_tensor):
         input_tensor = np.append(input_tensor, np.ones((input_tensor.shape[0], 1)), axis=1)
         self.input_tensor = input_tensor
