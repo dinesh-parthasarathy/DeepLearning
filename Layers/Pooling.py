@@ -1,7 +1,10 @@
 import numpy as np
+from Layers.Base import BaseLayer
 
-class Pooling:
+
+class Pooling(BaseLayer):
     def __init__(self, stride_shape, pooling_shape):
+        super().__init__()
         self.stride_shape = stride_shape
         self.pooling_shape = pooling_shape
         # Similar to stride_shape and convolution_shape
@@ -10,8 +13,8 @@ class Pooling:
         self.ip_shape = [input_tensor.shape[0], input_tensor.shape[1], input_tensor.shape[2], input_tensor.shape[3]]
         # Hint: Keep in mind to store the correct information necessary for the backward pass
         # Different to the convolutional layer, the pooling layer must be implemented only for the 2D case
-        dim1_shape = int(np.ceil( ( input_tensor.shape[2] -np.floor(self.pooling_shape[0]/2) )/self.stride_shape[0]))
-        dim2_shape = int(np.ceil((input_tensor.shape[3] -np.floor(self.pooling_shape[1]/2))/self.stride_shape[1]))
+        dim1_shape = int(np.ceil((input_tensor.shape[2] - np.floor(self.pooling_shape[0] / 2)) / self.stride_shape[0]))
+        dim2_shape = int(np.ceil((input_tensor.shape[3] - np.floor(self.pooling_shape[1] / 2)) / self.stride_shape[1]))
 
         self.ID = np.zeros_like(input_tensor)
         fwd = np.zeros((input_tensor.shape[0], input_tensor.shape[1], dim1_shape, dim2_shape), dtype='float')
@@ -26,7 +29,7 @@ class Pooling:
                     if (row + self.pooling_shape[0] <= input_tensor.shape[2]):
                         for col in range(0, input_tensor.shape[3], self.stride_shape[1]):
                             if (col + self.pooling_shape[1] <= input_tensor.shape[3]):
-                                region = input_tensor[b, ch, row:self.pooling_shape[0]+row:1, col:self.pooling_shape[1]+col:1].copy()
+                                region = input_tensor[b, ch, row:self.pooling_shape[0] + row:1, col:self.pooling_shape[1] + col:1].copy()
                                 result = np.where(region == np.amax(region))
                                 id = list(zip(result[0], result[1]))
                                 id_arr = np.array(id)
@@ -42,7 +45,7 @@ class Pooling:
 
     def backward(self, error_tensor):
         back = np.zeros(self.ip_shape, dtype='float')
-        print('back.shape',back.shape)
+        print('back.shape', back.shape)
         row_ID = 0
         col_ID = 0
         for b_e in range(error_tensor.shape[0]):

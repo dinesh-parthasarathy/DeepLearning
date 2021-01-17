@@ -12,14 +12,29 @@ class NeuralNetwork:
         self.data_layer = None
         self.loss_layer = None
         self.label_tensor = None
+        self._phase = None
+
+    @property
+    def phase(self):
+        return self._phase
+
+    @phase.setter
+    def phase(self, value):
+        self._phase = value
 
     def forward(self):
         input_data, self.label_tensor = self.data_layer.next()
-
+        regularization_loss = 0
         for lyr in self.layers:
+            lyr.testing_phase = self.phase
+            if lyr.weights is not None:
+                if lyr.optimizer is not None:
+                    if lyr.optimizer.regularizer is not None:
+                        regularization_loss += lyr.optimizer.regularizer.norm(lyr.weights)
+
             input_data = lyr.forward(input_data)
 
-        return self.loss_layer.forward(input_data, self.label_tensor)
+        return self.loss_layer.forward(input_data, self.label_tensor) + regularization_loss
 
     def backward(self):
         error_tensor = self.loss_layer.backward(self.label_tensor)
@@ -33,12 +48,15 @@ class NeuralNetwork:
         self.layers.append(layer)
 
     def train(self, iterations):
+        self.phase = False
         for i in range(iterations):
             self.loss.append(self.forward())
             self.backward()
 
     def test(self, input_tensor):
+        self.phase = True
         for lyr in self.layers:
+            lyr.testing_phase = self.phase
             input_tensor = lyr.forward(input_tensor)
 
         return input_tensor

@@ -1,8 +1,10 @@
 import numpy as np
+from Layers.Base import BaseLayer
 
 
-class SoftMax:
+class SoftMax(BaseLayer):
     def __init__(self):
+        super().__init__()
         self.output_tensor = None
 
     def forward(self, input_tensor):

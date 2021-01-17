@@ -1,9 +1,11 @@
 import numpy as np
+from Layers.Base import BaseLayer
 
 
-class Flatten:
+class Flatten(BaseLayer):
 
     def __init__(self):
+        super().__init__()
         self.shape = None
 
     def forward(self, input_tensor):
