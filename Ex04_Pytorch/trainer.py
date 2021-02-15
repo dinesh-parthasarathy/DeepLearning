@@ -1,6 +1,6 @@
 import torch as t
 from sklearn.metrics import f1_score
-from tqdm.autonotebook import tqdm
+import numpy as np
 from model import ResNet
 
 
@@ -67,7 +67,7 @@ class Trainer:
         self._model.train()
         total_loss = 0
         batch_size = self._train_dl.batch_sampler.batch_size
-        no_batches = len(self._train_dl)
+        no_batches = len(self._train_dl)  # MARK: check whether it returns all features or batches
         for x, y in self._train_dl:  # iterate through the training set
 
             if self._cuda:  # if a gpu is given
@@ -94,7 +94,7 @@ class Trainer:
                 total_loss += loss
                 Y = t.cat((Y, y))
                 OUT = t.cat((OUT, output))
-            self.F1_score.append(f1_score(Y.cpu(), OUT.cpu(), average="weighted"))
+            self.F1_score.append(f1_score(Y.cpu(), OUT.cpu(), average="macro"))
             print("Mean f1 score for EPOCH: ", self.F1_score[-1])
             return total_loss / (batch_size * no_batches)
 
@@ -104,7 +104,7 @@ class Trainer:
         train_loss = []
         val_loss = []
         ctr = 0
-        save_epoch = -1
+        F1_scores_highest = np.array([-1, -1, -1, -1, -1], dtype=float)  # 5 best F1 scores saved as checkpoints
         while True:
             for epoch in range(epochs):  # stop by epoch number
                 train_loss.append(self.train_epoch())  # train for a epoch
@@ -116,12 +116,13 @@ class Trainer:
                         ctr = 0
                 if 0 < self._early_stopping_patience <= ctr:
                     break
-                if save_epoch >= 0:
-                    if self.F1_score[-1] > self.F1_score[save_epoch]:  # TODO: Save a list of checkpoints
-                        save_epoch = epoch
-                        self.save_checkpoint(1)
-                else:
-                    self.save_checkpoint(1)
-                    save_epoch = epoch
+
+                # Choose checkpoint file with least F1 score for overwriting
+                pos = np.argmax(self.F1_score[-1] - F1_scores_highest)
+
+                # save only if current F1 score is greater than any one of the previously saved checkpoints
+                if self.F1_score[-1] - F1_scores_highest[pos] > 0:
+                    F1_scores_highest[pos] = self.F1_score[-1]
+                    self.save_checkpoint(pos)
 
             return train_loss, val_loss
