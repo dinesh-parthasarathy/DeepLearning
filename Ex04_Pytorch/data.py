@@ -1,10 +1,7 @@
 from torch.utils.data import Dataset
 import torch
-from pathlib import Path
 from skimage.io import imread
 from skimage.color import gray2rgb
-import numpy as np
-import torchvision as tv
 import torchvision.transforms as transforms
 import pandas as pd
 
@@ -22,22 +19,20 @@ class ChallengeDataset(Dataset):
                 transforms.ToPILImage(),
                 transforms.ToTensor(),
                 transforms.Normalize(train_mean, train_std)
-
             ])
 
         elif mode == 'train':
             self.transform = transforms.Compose([
                 transforms.ToPILImage(),
-
                 # Dynamic Data Augmentation
-                #transforms.RandomHorizontalFlip(p=0.5),
-                #transforms.RandomVerticalFlip(p=0.5),
-                #transforms.RandomRotation(degrees=(-90, 90)),
+                # transforms.RandomHorizontalFlip(p=0.5),
+                # transforms.RandomVerticalFlip(p=0.5),
                 transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4, hue=0.2),
                 transforms.ToTensor(),
                 transforms.Normalize(train_mean, train_std)
             ])
 
+    # TODO: Data augmentation to rotate images randomly at fixed angles (90,180,270)
     def __len__(self):
         return len(self.data_frame)
 

@@ -1,7 +1,6 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import torch as torch
-import torch.optim as opt
 
 
 # ResNet
